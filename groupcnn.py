@@ -68,12 +68,24 @@ class ConvP4(torch.nn.Module):
         return y
 
 
-class MaxPoolP4(torch.nn.Module):
+class MaxRotationPoolP4(torch.nn.Module):
     def forward(self, x):
         return x.max(2).values
 
 
-class AvgPoolP4(torch.nn.Module):
+class MaxSpatialPoolP4(torch.nn.Module):
+    def __init__(self, kernel_size, stride=None, padding=0):
+        super().__init__()
+        self.inner = torch.nn.MaxPool2d(kernel_size, stride, padding)
+    
+    def forward(self, x):
+        y = x.view(x.size(0), -1, x.size(3), x.size(4))
+        y = self.inner(y)
+        y = y.view(x.size(0), -1, 4, y.size(2), y.size(3))
+        return y
+
+
+class AvgRootPoolP4(torch.nn.Module):
     def forward(self, x):
         return x.mean(2)
 
